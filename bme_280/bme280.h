@@ -29,14 +29,14 @@
 #define BME280_OS_8			0x04	//Oversampling of the measurements = 8
 #define BME280_OS_16		0x05	//Oversampling of the measurements = 16
 
-#define BME280_STBY_05		0x00	//Standby time = 0.5ms
-#define BME280_STBY_62_5	0x01	//Standby time = 62.5ms
-#define BME280_STBY_125		0x02	//Standby time = 125ms
-#define BME280_STBY_250		0x03	//Standby time = 250ms
-#define BME280_STBY_500		0x04	//Standby time = 500ms
-#define BME280_STBY_1000	0x05	//Standby time = 1000ms
-#define BME280_STBY_10		0x06	//Standby time = 10ms
-#define BME280_STBY_20		0x07	//Standby time = 20ms
+#define BME280_PERIOD_05		0x00	//Standby time = 0.5ms
+#define BME280_PERIOD_62_5		0x01	//Standby time = 62.5ms
+#define BME280_PERIOD_125		0x02	//Standby time = 125ms
+#define BME280_PERIOD_250		0x03	//Standby time = 250ms
+#define BME280_PERIOD_500		0x04	//Standby time = 500ms
+#define BME280_PERIOD_1000		0x05	//Standby time = 1000ms
+#define BME280_PERIOD_10		0x06	//Standby time = 10ms
+#define BME280_PERIOD_20		0x07	//Standby time = 20ms
 
 #define BME280_FILTER_OFF	0x00
 #define BME280_FILTER_2		0x01
@@ -69,9 +69,10 @@ typedef struct bme_parameters{
 
 typedef struct bme280_conf
 {
-	uint8_t		bme280_mode;
-	uint8_t		bme280_output_speed;
-	uint8_t		bme280_filter;
+	uint8_t				mode;
+	uint8_t				over_sampling;
+	uint8_t				filter;
+	uint8_t				period;
 	I2C_HandleTypeDef	*BME_I2C;
 }bme280_conf_t;
 

@@ -13,6 +13,7 @@
 
 #define filterSize 100
 
+
 int currentIndex = 0;
 
 static void bme280_getVals(bme280_struct_t* BME, uint32_t* ut, uint32_t* up, uint32_t* uh)
@@ -20,11 +21,13 @@ static void bme280_getVals(bme280_struct_t* BME, uint32_t* ut, uint32_t* up, uin
 	uint8_t params[8];
 	HAL_StatusTypeDef retVal = HAL_I2C_Mem_Read(BME->device_config.BME_I2C, BME280_ADD, BME280_STATUS, I2C_MEMADD_SIZE_8BIT, params, 1, 30);
 	BME->flags.is_bme_updated_1 = 0;
-	if((params[0] & (0x01 << 3)) == (0x01 << 3))
+	BME->flags.is_bme_updated_3 = 0;
+	if((params[0] & 0x01) == 0x00)
 	{
 		retVal = HAL_I2C_Mem_Read(BME->device_config.BME_I2C, BME280_ADD, BME280_P_MSB_ADD, I2C_MEMADD_SIZE_8BIT, params, 8, 20);
 		if (retVal == HAL_OK){
 			BME->flags.is_bme_updated_1 = 1;
+			BME->flags.is_bme_updated_3 = 1;
 			*ut = 	((int32_t)params[3] << 12) | ((int32_t)params[4] << 4) | ((int32_t)params[5]  >> 4);
 			*up =	((int32_t)params[0] << 12) | ((int32_t)params[1] << 4) | ((int32_t)params[2]  >> 4);
 			*uh =	((int32_t)params[6] << 8) | ((int32_t)params[7]);
@@ -37,6 +40,7 @@ static void bme280_get_altitude(bme280_struct_t* BME)
 {
 	float p_seaLevel = 1013.25;		//hPa
 	float alt = 44330.0 * (1.0 - pow((BME->datas.pressure / p_seaLevel), (1.0 / 5.255)));
+	BME->datas.height = alt;
 	BME->datas.altitude = alt - BME->parameters->base_alt;
 	if(BME->datas.altitude > BME->parameters->max_alt && BME->parameters->base_alt != 0.0)
 	{
@@ -80,13 +84,13 @@ void bme280_config(bme280_struct_t* BME)
 	BME->parameters->dig_H6 = params[6];
 
 	uint8_t data_ctrl = 0;
-	data_ctrl = BME->device_config.bme280_output_speed;
+	data_ctrl = BME->device_config.over_sampling;
 	retVal = HAL_I2C_Mem_Write(BME->device_config.BME_I2C, BME280_ADD, BME280_CTRL_HUM, I2C_MEMADD_SIZE_8BIT, &data_ctrl, 1, 50);		//Humidity sensor over sampling set to OS.
 	data_ctrl = 0;
-	data_ctrl = BME->device_config.bme280_mode | (BME->device_config.bme280_output_speed << 2) | (BME->device_config.bme280_output_speed << 5);																		//Mode has been chosed.
+	data_ctrl = BME->device_config.mode | (BME->device_config.over_sampling << 2) | (BME->device_config.over_sampling << 5);																		//Mode has been chosed.
 	retVal = HAL_I2C_Mem_Write(BME->device_config.BME_I2C, BME280_ADD, BME280_CTRL_MEAS, I2C_MEMADD_SIZE_8BIT, &data_ctrl, 1, 50);		//Temp and pressure sensors' over sampling set to OS.
 	data_ctrl = 0;
-	data_ctrl = (BME->device_config.bme280_filter << 2);
+	data_ctrl = (BME->device_config.filter << 2) | (BME->device_config.period << 5);
 	retVal = HAL_I2C_Mem_Write(BME->device_config.BME_I2C, BME280_ADD, BME280_CONFIG, I2C_MEMADD_SIZE_8BIT, &data_ctrl, 1, 50);
 
 	float base = 0.0;
