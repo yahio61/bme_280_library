@@ -128,7 +128,7 @@ uint8_t bme280_init(bme280_struct_t* BME)
 
 void bme280_update(bme280_struct_t* BME){
 	int32_t var1_t, var2_t, T, adc_T;
-	uint32_t	ut, up, uh;
+	uint32_t	ut = 0, up = 0, uh = 0;
 
 	bme280_getVals(BME, &ut, &up, &uh);
 
@@ -175,6 +175,9 @@ void bme280_update(bme280_struct_t* BME){
 		var_h = (var_h < 0 ? 0 : var_h);
 		var_h = (var_h > 419430400 ? 419430400 : var_h);
 		BME->datas.humidity = ((float)(var_h >> 12)) / 1024.0;
+
+		// Get time of update.
+		BME->datas.time_of_update = HAL_GetTick();
 
 		//get altitude
 		bme280_get_altitude(BME);

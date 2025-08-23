@@ -86,12 +86,13 @@ typedef struct bme280_flags
 
 typedef struct bme280_datas
 {
-	float temperature;	//(C)
-	float pressure;		//(mBar)
-	float humidity;		//percentage (%)
-	float height;		//height form the sea level in (m)
-	float altitude;		//height form the base level in (m)
-	float velocity;		//(m/s)
+	float 		temperature;	//(C)
+	float 		pressure;		//(mBar)
+	float 		humidity;		//percentage (%)
+	float 		height;			//height form the sea level in (m)
+	float 		altitude;		//height form the base level in (m)
+	float 		velocity;		//(m/s)
+	uint32_t	time_of_update;	//(ms)
 }bme280_datas_t;
 
 typedef struct bme280_struct
