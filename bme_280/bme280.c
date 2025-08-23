@@ -176,6 +176,9 @@ void bme280_update(bme280_struct_t* BME){
 		var_h = (var_h > 419430400 ? 419430400 : var_h);
 		BME->datas.humidity = ((float)(var_h >> 12)) / 1024.0;
 
+		// Get time of update.
+		BME->datas.time_of_update = HAL_GetTick();
+
 		//get altitude
 		bme280_get_altitude(BME);
 		BME->flags.is_bme_updated_1 = 0;
